@@ -65,3 +65,4 @@ fastlane/test_output
 fastlane/readme.md
 /.idea/vcs.xml
 /.idea/workspace.xml
+/.idea/codeStyles/Project.xml

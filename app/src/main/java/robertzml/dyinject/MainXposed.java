@@ -28,7 +28,7 @@ public class MainXposed implements IXposedHookLoadPackage {
         }
         XposedBridge.log("Injection Loaded app: " + lpparam.packageName);
 
-        HookFollower(lpparam);
+        HookFollower2(lpparam);
         HookFollowing(lpparam);
         HookComment(lpparam);
     }
@@ -118,6 +118,41 @@ public class MainXposed implements IXposedHookLoadPackage {
                     protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                         XposedBridge.log("---Hook Follower End---");
 
+                        Object result = param.getResult();
+
+                        super.afterHookedMethod(param);
+                    }
+                });
+    }
+
+    private void HookFollower2(XC_LoadPackage.LoadPackageParam lpparam) {
+
+        Class<?> c = XposedHelpers.findClass("com.ss.android.ugc.aweme.following.b.b", lpparam.classLoader);
+
+        findAndHookMethod("com.ss.android.ugc.aweme.app.api.a", lpparam.classLoader, "a",
+                String.class, Class.class, String.class, new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        XposedBridge.log("---Hook Follower Start---");
+
+                        // XposedBridge.log(param.args[1].getClass().getName());
+                        super.beforeHookedMethod(param);
+                    }
+
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                        XposedBridge.log("---Hook Follower End---");
+
+                        Object result = param.getResult();
+
+                        if (result != null) {
+                            XposedBridge.log(result.toString());
+
+                            String js = JSON.toJSONString(result);
+                            XposedBridge.log(js);
+
+                            // String r = post("http://192.168.1.106:5000/comment", js);
+                        }
                         super.afterHookedMethod(param);
                     }
                 });

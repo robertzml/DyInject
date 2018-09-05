@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.io.IOException;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
+import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
@@ -22,12 +23,17 @@ public class MainXposed implements IXposedHookLoadPackage {
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
 
-        XposedBridge.log("Injection Loaded app: " + lpparam.packageName);
-
         if (!lpparam.packageName.equals("com.ss.android.ugc.aweme")) {
             return;
         }
+        XposedBridge.log("Injection Loaded app: " + lpparam.packageName);
 
+        HookFollower(lpparam);
+        HookFollowing(lpparam);
+        HookComment(lpparam);
+    }
+
+    private void HookComment(XC_LoadPackage.LoadPackageParam lpparam) {
         findAndHookMethod("com.ss.android.ugc.aweme.comment.api.CommentApi", lpparam.classLoader, "a",
                 String.class, long.class, int.class, int.class, String.class, String.class, new XC_MethodHook() {
                     @Override
@@ -49,7 +55,7 @@ public class MainXposed implements IXposedHookLoadPackage {
                         String js = JSON.toJSONString(result);
                         XposedBridge.log(js);
 
-                        String r = post("http://192.168.1.106:5000/comment", js);
+                        // String r = post("http://192.168.1.106:5000/comment", js);
                         /*
                         StringBuilder sbName = new StringBuilder();
                         StringBuilder sbValue = new StringBuilder();
@@ -74,6 +80,48 @@ public class MainXposed implements IXposedHookLoadPackage {
                 });
     }
 
+    // 关注列表
+    private void HookFollowing(XC_LoadPackage.LoadPackageParam lpparam) {
+        Class<?> c = XposedHelpers.findClass("com.ss.android.ugc.aweme.following.a.c", lpparam.classLoader);
+
+        findAndHookMethod("com.ss.android.ugc.aweme.following.b.c", lpparam.classLoader, "a",
+                c, new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        XposedBridge.log("---Hook Following Start---");
+                        super.beforeHookedMethod(param);
+                    }
+
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                        XposedBridge.log("---Hook Following End---");
+
+                        super.afterHookedMethod(param);
+                    }
+                });
+    }
+
+    // 粉丝列表
+    private void HookFollower(XC_LoadPackage.LoadPackageParam lpparam) {
+
+        Class<?> c = XposedHelpers.findClass("com.ss.android.ugc.aweme.following.a.c", lpparam.classLoader);
+
+        findAndHookMethod("com.ss.android.ugc.aweme.following.b.a", lpparam.classLoader, "a",
+                c, new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        XposedBridge.log("---Hook Follower Start---");
+                        super.beforeHookedMethod(param);
+                    }
+
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                        XposedBridge.log("---Hook Follower End---");
+
+                        super.afterHookedMethod(param);
+                    }
+                });
+    }
 
     private String post(String url, String json) {
         RequestBody body = RequestBody.create(Media, json);

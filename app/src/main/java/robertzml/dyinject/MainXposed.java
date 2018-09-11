@@ -1,5 +1,7 @@
 package robertzml.dyinject;
 
+import android.os.Bundle;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.io.IOException;
@@ -28,9 +30,10 @@ public class MainXposed implements IXposedHookLoadPackage {
         }
         XposedBridge.log("Injection Loaded app: " + lpparam.packageName);
 
-        HookFollower2(lpparam);
-        HookFollowing(lpparam);
-        HookComment(lpparam);
+        //HookFollower2(lpparam);
+        //HookFollowing(lpparam);
+        //HookComment(lpparam);
+        HookChatActivity(lpparam);
     }
 
     private void HookComment(XC_LoadPackage.LoadPackageParam lpparam) {
@@ -55,7 +58,7 @@ public class MainXposed implements IXposedHookLoadPackage {
                         String js = JSON.toJSONString(result);
                         XposedBridge.log(js);
 
-                        // String r = post("http://192.168.1.106:5000/comment", js);
+                        String r = post("http://192.168.1.106:5000/data", js);
                         /*
                         StringBuilder sbName = new StringBuilder();
                         StringBuilder sbValue = new StringBuilder();
@@ -134,6 +137,7 @@ public class MainXposed implements IXposedHookLoadPackage {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                         XposedBridge.log("---Hook Follower Start---");
+                        XposedBridge.log("first = " + param.args[0]);
 
                         // XposedBridge.log(param.args[1].getClass().getName());
                         super.beforeHookedMethod(param);
@@ -151,8 +155,29 @@ public class MainXposed implements IXposedHookLoadPackage {
                             String js = JSON.toJSONString(result);
                             XposedBridge.log(js);
 
-                            // String r = post("http://192.168.1.106:5000/comment", js);
+                            String r = post("http://192.168.1.106:5000/data", js);
                         }
+                        super.afterHookedMethod(param);
+                    }
+                });
+    }
+
+    private void HookChatActivity(XC_LoadPackage.LoadPackageParam lpparam) {
+
+        findAndHookMethod("com.ss.android.ugc.aweme.im.sdk.chat.ChatRoomActivity", lpparam.classLoader, "onCreate",
+                Bundle.class, new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        XposedBridge.log("---Hook chat Start---");
+                        super.beforeHookedMethod(param);
+                    }
+
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                        XposedBridge.log("---Hook chat End---");
+
+                        // Object result = param.getResult();
+
                         super.afterHookedMethod(param);
                     }
                 });

@@ -78,6 +78,43 @@ public class Hook {
                 });
     }
 
+    /**
+     * 粉丝列表
+     */
+    public void Follower() {
+
+        findAndHookMethod("com.ss.android.ugc.aweme.following.b.a", lpparam.classLoader, "getItems",
+                new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        XposedBridge.log("---Hook Follower Start---");
+
+                        // XposedBridge.log(param.args[1].getClass().getName());
+                        super.beforeHookedMethod(param);
+                    }
+
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                        XposedBridge.log("---Hook Follower End---");
+
+                        Object result = param.getResult();
+
+                        if (result != null) {
+                            // XposedBridge.log(result.toString());
+
+                            String js = JSON.toJSONString(result);
+                            XposedBridge.log(js);
+
+                            HttpRunnable runnable = new HttpRunnable(js);
+                            Thread thread1 = new Thread(runnable);
+                            thread1.start();
+                        }
+
+                        super.afterHookedMethod(param);
+                    }
+                });
+    }
+
     // 关注列表
     private void HookFollowing() {
         Class<?> c = XposedHelpers.findClass("com.ss.android.ugc.aweme.following.a.c", lpparam.classLoader);
@@ -99,30 +136,6 @@ public class Hook {
                 });
     }
 
-
-    // 粉丝列表
-    private void HookFollower() {
-
-        Class<?> c = XposedHelpers.findClass("com.ss.android.ugc.aweme.following.a.c", lpparam.classLoader);
-
-        findAndHookMethod("com.ss.android.ugc.aweme.following.b.a", lpparam.classLoader, "a",
-                c, new XC_MethodHook() {
-                    @Override
-                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                        XposedBridge.log("---Hook Follower Start---");
-                        super.beforeHookedMethod(param);
-                    }
-
-                    @Override
-                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                        XposedBridge.log("---Hook Follower End---");
-
-                        Object result = param.getResult();
-
-                        super.afterHookedMethod(param);
-                    }
-                });
-    }
 
     private void HookFollower2() {
 
@@ -158,12 +171,6 @@ public class Hook {
                 });
     }
 
-    /**
-     * 粉丝列表
-     */
-    public void HookFollower3() {
-
-    }
 
     public void HookChatActivity() {
 

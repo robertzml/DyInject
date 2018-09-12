@@ -17,6 +17,9 @@ public class MainXposed implements IXposedHookLoadPackage {
         }
         XposedBridge.log("Injection Loaded app: " + lpparam.packageName);
 
+        Hook hook = new Hook(lpparam);
+        hook.Follower();
+
         //HookFollower2(lpparam);
         //HookFollowing(lpparam);
         //HookComment(lpparam);

@@ -19,6 +19,7 @@ public class MainXposed implements IXposedHookLoadPackage {
 
         Hook hook = new Hook(lpparam);
         hook.Follower();
+        hook.Profile();
 
         //HookFollower2(lpparam);
         //HookFollowing(lpparam);

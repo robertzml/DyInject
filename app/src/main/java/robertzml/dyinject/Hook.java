@@ -103,7 +103,7 @@ public class Hook {
                             // XposedBridge.log(result.toString());
 
                             String js = JSON.toJSONString(result);
-                            XposedBridge.log(js);
+                            // XposedBridge.log(js);
 
                             HttpRunnable runnable = new HttpRunnable(js);
                             Thread thread1 = new Thread(runnable);
@@ -115,21 +115,34 @@ public class Hook {
                 });
     }
 
-    // 关注列表
-    private void HookFollowing() {
-        Class<?> c = XposedHelpers.findClass("com.ss.android.ugc.aweme.following.a.c", lpparam.classLoader);
+    /**
+     * 用户个人信息页
+     */
+    public void Profile() {
+        Class<?> u = XposedHelpers.findClass("com.ss.android.ugc.aweme.profile.model.User", lpparam.classLoader);
 
-        findAndHookMethod("com.ss.android.ugc.aweme.following.b.c", lpparam.classLoader, "a",
-                c, new XC_MethodHook() {
+        findAndHookMethod("com.ss.android.ugc.aweme.profile.api.g", lpparam.classLoader, "c",
+                u, new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                        XposedBridge.log("---Hook Following Start---");
+                        XposedBridge.log("---Hook Profile Start---");
+
+                        Object p = param.args[0];
+                        if (p != null) {
+                            String js = JSON.toJSONString(p);
+                            //XposedBridge.log(js);
+
+                            ProfileRunnable runnable = new ProfileRunnable(js);
+                            Thread thread1 = new Thread(runnable);
+                            thread1.start();
+                        }
+
                         super.beforeHookedMethod(param);
                     }
 
                     @Override
                     protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                        XposedBridge.log("---Hook Following End---");
+                        XposedBridge.log("---Hook Profile End---");
 
                         super.afterHookedMethod(param);
                     }

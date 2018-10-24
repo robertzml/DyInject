@@ -208,6 +208,43 @@ public class Hook {
 
 
     /**
+     *  微视粉丝列表
+     */
+    public void HookWsFollower() {
+        Class<?> c = XposedHelpers.findClass("com.tencent.oscar.model.User", lpparam.classLoader);
+        Class<?> list = XposedHelpers.findClass("java.util.List", lpparam.classLoader);
+        Class<?> d = XposedHelpers.findClass("NS_KING_INTERFACE.stGetUsersRsp", lpparam.classLoader);
+
+
+        findAndHookMethod("com.tencent.oscar.module.main.profile.ProfileFansActivity", lpparam.classLoader, "a",
+                d, new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        XposedBridge.log("---Hook Follower Start---");
+
+                        Object param0 = param.args[0];
+
+                        if (param0 != null) {
+                            String js = JSON.toJSONString(param0);
+                            XposedBridge.log(js);
+                        }
+
+                        //XposedBridge.log("first = " + param.args[0]);
+                        //XposedBridge.log("second = " + param.args[1]);
+
+                        super.beforeHookedMethod(param);
+                    }
+
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                        XposedBridge.log("---Hook Follower End---");
+
+                        super.afterHookedMethod(param);
+                    }
+                });
+    }
+
+    /**
      * 获取属性名数组
      * */
     private static String[] getFiledName(Object o){

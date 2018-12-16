@@ -19,7 +19,7 @@ public class HttpClient {
 
     private OkHttpClient client = new OkHttpClient();
 
-    private String host = "http://192.168.1.106:5000/";
+    private String host = "http://192.168.1.10:8819/";
     //endregion Field
 
     /**

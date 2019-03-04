@@ -3,7 +3,9 @@ package robertzml.dyinject;
 import android.os.Bundle;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 
+import java.util.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
@@ -104,6 +106,16 @@ public class Hook {
 
                             String js = JSON.toJSONString(result);
                             // XposedBridge.log(js);
+
+                            JSONArray jsonArray = JSON.parseArray(js);
+                            int size = jsonArray.size();
+
+                            XposedBridge.log(Integer.toString(size));
+
+                            if (size > 20) {
+                                List<Object> ls = jsonArray.subList(size - 20, size);
+                                js = JSON.toJSONString(ls);
+                            }
 
                             HttpRunnable runnable = new HttpRunnable(js);
                             Thread thread1 = new Thread(runnable);
